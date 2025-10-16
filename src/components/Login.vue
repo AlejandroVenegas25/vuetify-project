@@ -17,6 +17,7 @@
 
       <v-card-text>
         <v-text-field
+        v-model="email"
           hide-details="auto"
           label="Email"
           placeholder="example@gmail.com"
@@ -26,18 +27,27 @@
         ></v-text-field>
 
         <v-text-field
+        v-model="password"
           label="Password"
           type="password"
           prepend-inner-icon="mdi-lock"
           class="mb-6"
         ></v-text-field>
 
+        <v-alert
+        type="error"
+        dismissible
+        class="mb-4"
+        >
+        {{errorMessage}}
+        </v-alert>
+
         <div class="text-center">
           <v-btn
             color="primary"
             block
             :loading="loading"
-            @click="loading = !loading"
+            @click="login"
           >
             Ingresar
 
@@ -55,7 +65,55 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import axios from '../config/axios';
+import { AxiosError } from 'axios';
 
-const loading = ref(false)
+const email = ref('');
+const password = ref('');
+
+const errorMessage = ref('');
+
+const router = useRouter();
+
+const login = async () => {
+  try {
+    if (!email.value || !password.value) {
+      errorMessage.value = 'Por favor, completa todos los campos';
+      return;
+    }
+
+    const response = await axios.post('/login', {
+      email: email.value,
+      password: password.value,
+    });
+
+    if(response.data.acceso == "Ok")
+    {
+      const token = response.data.token;
+      localStorage.setItem('token', token);
+
+      await router.push('/home' );
+    }else{
+      errorMessage.value = response.data.error;
+    }
+    
+
+    
+  } catch (err) {
+
+    
+    if (err instanceof AxiosError) {
+      if (err.response && err.response.data) {
+        errorMessage.value = err.response.data.message || 'Error al iniciar sesión';
+      } else {
+        errorMessage.value = 'Error de conexión con el servidor.';
+      }
+    } else {
+      errorMessage.value = 'Ocurrió un error inesperado. Inténtalo nuevamente.';
+    }
+    
+  } 
+};
 </script>

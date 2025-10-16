@@ -13,6 +13,19 @@ const router = createRouter({
   routes,
 })
 
+const isAuthenticated = (): boolean => {
+  return !!localStorage.getItem('token')
+}
+
+router.beforeEach((to, from, next) => {
+  if (to.name != '/' && !isAuthenticated()) {
+    console.warn('Acceso denegado. Redirigiendo a login.')
+    next('/') 
+  } else {
+    next() 
+  }
+})
+
 // Workaround for https://github.com/vitejs/vite/issues/11804
 router.onError((err, to) => {
   if (err?.message?.includes?.('Failed to fetch dynamically imported module')) {
