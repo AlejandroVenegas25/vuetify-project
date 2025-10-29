@@ -3,10 +3,29 @@
     <h1 class="mb-4">Gestión de Gastos</h1>
 
     <v-form @submit.prevent="guardarGasto">
-      <v-text-field v-model="nuevoGasto.fecha" label="Fecha" type="date" required></v-text-field>
-      <v-text-field v-model="nuevoGasto.monto" label="Monto" type="number" required></v-text-field>
-      <v-text-field v-model="nuevoGasto.descripcion" label="Descripción" required></v-text-field>
-      <v-btn color="primary" type="submit">{{ editando ? 'Actualizar' : 'Agregar' }}</v-btn>
+      <v-text-field
+        v-model="nuevoGasto.fecha"
+        label="Fecha"
+        type="date"
+        required
+      ></v-text-field>
+
+      <v-text-field
+        v-model="nuevoGasto.monto"
+        label="Monto"
+        type="number"
+        required
+      ></v-text-field>
+
+      <v-text-field
+        v-model="nuevoGasto.descripcion"
+        label="Descripción"
+        required
+      ></v-text-field>
+
+      <v-btn color="primary" type="submit">
+        {{ editando ? 'Actualizar' : 'Agregar' }}
+      </v-btn>
     </v-form>
 
     <v-divider class="my-4"></v-divider>
@@ -26,8 +45,13 @@
           <td>${{ g.monto }}</td>
           <td>{{ g.descripcion }}</td>
           <td>
-            <v-btn color="blue" size="small" @click="editarGasto(g)">Editar</v-btn>
-            <v-btn color="red" size="small" @click="eliminarGasto(g.id)">Eliminar</v-btn>
+            <v-btn color="blue" size="small" @click="editarGasto(g)">
+              Editar
+            </v-btn>
+            <!-- ✅ Corrección aquí: g.id! -->
+            <v-btn color="red" size="small" @click="eliminarGasto(g.id!)">
+              Eliminar
+            </v-btn>
           </td>
         </tr>
       </tbody>
@@ -58,7 +82,10 @@ const cargarGastos = async () => {
 
 const guardarGasto = async () => {
   if (editando.value && idEditando.value) {
-    await axios.put(`http://127.0.0.1:8000/api/gastos/${idEditando.value}`, nuevoGasto.value)
+    await axios.put(
+      `http://127.0.0.1:8000/api/gastos/${idEditando.value}`,
+      nuevoGasto.value
+    )
     editando.value = false
   } else {
     await axios.post('http://127.0.0.1:8000/api/gastos', nuevoGasto.value)

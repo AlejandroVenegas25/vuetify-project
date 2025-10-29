@@ -17,7 +17,7 @@
 
       <v-card-text>
         <v-text-field
-        v-model="email"
+          v-model="email"
           hide-details="auto"
           label="Email"
           placeholder="example@gmail.com"
@@ -27,7 +27,7 @@
         ></v-text-field>
 
         <v-text-field
-        v-model="password"
+          v-model="password"
           label="Password"
           type="password"
           prepend-inner-icon="mdi-lock"
@@ -35,11 +35,12 @@
         ></v-text-field>
 
         <v-alert
-        type="error"
-        dismissible
-        class="mb-4"
+          v-if="errorMessage"
+          type="error"
+          dismissible
+          class="mb-4"
         >
-        {{errorMessage}}
+          {{ errorMessage }}
         </v-alert>
 
         <div class="text-center">
@@ -47,6 +48,7 @@
             color="primary"
             block
             :loading="loading"
+            :disabled="loading"
             @click="login"
           >
             Ingresar
@@ -65,55 +67,55 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import axios from '../config/axios';
-import { AxiosError } from 'axios';
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import axios from '../config/axios'
+import { AxiosError } from 'axios'
 
-const email = ref('');
-const password = ref('');
+// Variables reactivas
+const email = ref('')
+const password = ref('')
+const errorMessage = ref('')
+const loading = ref(false) // 👈 se agregó esta línea
 
-const errorMessage = ref('');
+const router = useRouter()
 
-const router = useRouter();
-
+// Función de inicio de sesión
 const login = async () => {
+  errorMessage.value = ''
+  loading.value = true // 👈 activa el loader del botón
+
   try {
     if (!email.value || !password.value) {
-      errorMessage.value = 'Por favor, completa todos los campos';
-      return;
+      errorMessage.value = 'Por favor, completa todos los campos'
+      return
     }
 
     const response = await axios.post('/login', {
       email: email.value,
       password: password.value,
-    });
+    })
 
-    if(response.data.acceso == "Ok")
-    {
-      const token = response.data.token;
-      localStorage.setItem('token', token);
-
-      await router.push('/home' );
-    }else{
-      errorMessage.value = response.data.error;
+    if (response.data.acceso === 'Ok') {
+      const token = response.data.token
+      localStorage.setItem('token', token)
+      await router.push('/home')
+    } else {
+      errorMessage.value = response.data.error || 'Credenciales incorrectas'
     }
-    
-
-    
   } catch (err) {
-
-    
     if (err instanceof AxiosError) {
       if (err.response && err.response.data) {
-        errorMessage.value = err.response.data.message || 'Error al iniciar sesión';
+        errorMessage.value =
+          err.response.data.message || 'Error al iniciar sesión'
       } else {
-        errorMessage.value = 'Error de conexión con el servidor.';
+        errorMessage.value = 'Error de conexión con el servidor.'
       }
     } else {
-      errorMessage.value = 'Ocurrió un error inesperado. Inténtalo nuevamente.';
+      errorMessage.value = 'Ocurrió un error inesperado. Inténtalo nuevamente.'
     }
-    
-  } 
-};
+  } finally {
+    loading.value = false // 👈 desactiva el loader
+  }
+}
 </script>
