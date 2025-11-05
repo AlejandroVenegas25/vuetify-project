@@ -4,7 +4,6 @@
  * Automatic routes for `./src/pages/*.vue`
  */
 
-// Composables
 import { createRouter, createWebHistory } from 'vue-router'
 import { routes } from 'vue-router/auto-routes'
 
@@ -18,15 +17,15 @@ const isAuthenticated = (): boolean => {
 }
 
 router.beforeEach((to, from, next) => {
-  if (to.name != '/' && !isAuthenticated()) {
-    console.warn('Acceso denegado. Redirigiendo a login.')
-    next('/') 
+  // ✅ Permitimos libre acceso a login y registro
+  if ((to.path === '/' || to.path === '/registro') || isAuthenticated()) {
+    next()
   } else {
-    next() 
+    console.warn('Acceso denegado. Redirigiendo a login.')
+    next('/')
   }
 })
 
-// Workaround for https://github.com/vitejs/vite/issues/11804
 router.onError((err, to) => {
   if (err?.message?.includes?.('Failed to fetch dynamically imported module')) {
     if (localStorage.getItem('vuetify:dynamic-reload')) {

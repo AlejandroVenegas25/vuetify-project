@@ -1,33 +1,41 @@
 <template>
-  <v-dialog v-model="isOffline" persistent max-width="400" overlay-opacity="0.8">
-    <v-card color="error" dark>
-      <v-card-title class="text-h6">
-        <v-icon left>mdi-wifi-off</v-icon>
-        Sin conexión
-      </v-card-title>
+  <v-dialog v-model="mostrar" max-width="400">
+    <v-card>
+      <v-card-title class="headline">Sin conexión</v-card-title>
       <v-card-text>
-        Estás trabajando sin conexión a internet. Algunas funciones pueden no estar disponibles.
+        ⚠️ No tienes conexión a Internet. Tu información se guardará localmente.
       </v-card-text>
+      <v-card-actions>
+        <v-btn color="primary" @click="cerrarAviso">Aceptar</v-btn>
+      </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
 
-<script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+<script setup lang="ts">
+import { ref, onMounted, onUnmounted } from 'vue'
 
-const isOffline = ref(!navigator.onLine)
+const mostrar = ref(!navigator.onLine)
 
-function updateStatus() {
-  isOffline.value = !navigator.onLine
+const cerrarAviso = () => {
+  mostrar.value = false
+}
+
+const actualizarConexion = () => {
+  if (!navigator.onLine) {
+    mostrar.value = true
+  } else {
+    mostrar.value = false
+  }
 }
 
 onMounted(() => {
-  window.addEventListener('online', updateStatus)
-  window.addEventListener('offline', updateStatus)
+  window.addEventListener('online', actualizarConexion)
+  window.addEventListener('offline', actualizarConexion)
 })
 
-onBeforeUnmount(() => {
-  window.removeEventListener('online', updateStatus)
-  window.removeEventListener('offline', updateStatus)
+onUnmounted(() => {
+  window.removeEventListener('online', actualizarConexion)
+  window.removeEventListener('offline', actualizarConexion)
 })
 </script>

@@ -12,6 +12,7 @@ declare module 'vue' {
     Home: typeof import('./components/Home.vue')['default']
     Login: typeof import('./components/Login.vue')['default']
     OfflineDialog: typeof import('./components/OfflineDialog.vue')['default']
+    Registro: typeof import('./components/Registro.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }

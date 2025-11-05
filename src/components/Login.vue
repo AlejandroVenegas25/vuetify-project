@@ -1,11 +1,6 @@
 <template>
   <v-container fluid class="fill-height d-flex align-center justify-center bg-grey-lighten-4">
-    <v-card
-      class="pa-6"
-      elevation="12"
-      max-width="400"
-      rounded="xl"
-    >
+    <v-card class="pa-6" elevation="12" max-width="400" rounded="xl">
       <v-card-item>
         <v-card-title class="text-h5 font-weight-bold text-center">
           Inicio de Sesión
@@ -24,7 +19,7 @@
           type="email"
           prepend-inner-icon="mdi-email"
           class="mb-4"
-        ></v-text-field>
+        />
 
         <v-text-field
           v-model="password"
@@ -32,7 +27,7 @@
           type="password"
           prepend-inner-icon="mdi-lock"
           class="mb-6"
-        ></v-text-field>
+        />
 
         <v-alert
           v-if="errorMessage"
@@ -43,7 +38,7 @@
           {{ errorMessage }}
         </v-alert>
 
-        <div class="text-center">
+        <div class="text-center mb-3">
           <v-btn
             color="primary"
             block
@@ -54,11 +49,15 @@
             Ingresar
 
             <template v-slot:loader>
-              <v-progress-linear
-                indeterminate
-                color="white"
-              ></v-progress-linear>
+              <v-progress-linear indeterminate color="white"></v-progress-linear>
             </template>
+          </v-btn>
+        </div>
+
+        <!-- 🔹 Nuevo botón para registro -->
+        <div class="text-center">
+          <v-btn variant="outlined" color="secondary" block @click="goToRegister">
+            Registrarse
           </v-btn>
         </div>
       </v-card-text>
@@ -72,18 +71,16 @@ import { useRouter } from 'vue-router'
 import axios from '../config/axios'
 import { AxiosError } from 'axios'
 
-// Variables reactivas
 const email = ref('')
 const password = ref('')
 const errorMessage = ref('')
-const loading = ref(false) // 👈 se agregó esta línea
+const loading = ref(false)
 
 const router = useRouter()
 
-// Función de inicio de sesión
 const login = async () => {
   errorMessage.value = ''
-  loading.value = true // 👈 activa el loader del botón
+  loading.value = true
 
   try {
     if (!email.value || !password.value) {
@@ -106,8 +103,7 @@ const login = async () => {
   } catch (err) {
     if (err instanceof AxiosError) {
       if (err.response && err.response.data) {
-        errorMessage.value =
-          err.response.data.message || 'Error al iniciar sesión'
+        errorMessage.value = err.response.data.message || 'Error al iniciar sesión'
       } else {
         errorMessage.value = 'Error de conexión con el servidor.'
       }
@@ -115,7 +111,12 @@ const login = async () => {
       errorMessage.value = 'Ocurrió un error inesperado. Inténtalo nuevamente.'
     }
   } finally {
-    loading.value = false // 👈 desactiva el loader
+    loading.value = false
   }
+}
+
+// 🔹 Nueva función para redirigir al formulario de registro
+const goToRegister = () => {
+  router.push('/registro')
 }
 </script>
